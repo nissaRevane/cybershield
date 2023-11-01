@@ -14,7 +14,8 @@ class ApiPlayer:
         response = requests.post(self.URL, headers=self.__headers(), data=self.__data())
         if response.status_code == 200:
             return {
-                "score": response.json()["score"]
+                "score": response.json()["score"],
+                "risks": self.__risks_coverage(response.json()["risks"])
             }
 
         raise Exception("Error on API call: {}".format(response.json()["error"]))
@@ -28,3 +29,8 @@ class ApiPlayer:
     
     def __data(self):
         return json.dumps({ "measures": self.measures_data })
+
+    def __risks_coverage(self, risks):
+        list_covergae_risk = list(map(lambda risk: (risk["identifier"], risk["coverage"]), risks))
+        return dict(list_covergae_risk)
+        
