@@ -15,7 +15,7 @@ class ScoreComputer:
         if response.status_code == 200:
             return response.json()["score"]
         
-        raise Exception("Failed to compute score: {}".format(response.text))
+        return 0
 
     def __headers(self):
         return({

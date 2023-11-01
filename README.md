@@ -20,4 +20,4 @@ python3 -m pip install requests
 
 The first idea is to try every combinaition of 3 measures. But we only sent a request if the cost constraint is respected and if at least one measure risk have a better coverage than the best. If this new combinaison is better than the best, we update the best combinaison.
 
-There is 15 measures, so there is 2730 (15 x 14 x 13) combinaisons of 3 measures. But we can reduce this number by removing the combinaisons with a cost higher than 100k. We can also remove the combinaisons with a risk coverage lower than the best coverage for every risk.
+There is 15 measures, so there is 455(3 out of 15) combinaisons of 3 measures. But we can reduce this number by removing the combinaisons with a cost higher than 100k. We can also remove the combinaisons with a risk coverage lower than the best coverage for every risk.

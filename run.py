@@ -1,16 +1,19 @@
 import random
 
 from tenacy_api.token_generator import TokenGenerator
-from tenacy_api.score_computer import ScoreComputer
+from tenacy_api.score_optimizer import ScoreOptimizer
 from tenacy_api.measures_data import MeasuresData
 
 name = "player{}".format(random.randint(0, 1000))
 email = "{}@email.io".format(name)
 
 token = TokenGenerator(name, email).call()
-measures_identifiers = MeasuresData().identifiers()
+best_solution = ScoreOptimizer(token).call()
 
-measures = random.sample(measures_identifiers, 3)
-score = ScoreComputer(token, measures).call()
+best_measures = best_solution["best_measures"]
+best_score = best_solution["best_score"]
+computation_metric = best_solution["computation_metric"]
 
-print("For measures: {} the score is: {}".format(", ".join(measures), score))
+print("The best solution have a score of {}".format(best_score))
+print("It uses the following measures: {}".format(", ".join(best_measures)))
+print("The computation have been done in {} API requests".format(computation_metric))
