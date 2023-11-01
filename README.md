@@ -22,4 +22,10 @@ The first idea is to try every combinaition of 3 measures. But we only sent a re
 
 There is 15 measures, so there is 455(3 out of 15) combinaisons of 3 measures. But we can reduce this number by removing the combinaisons with a cost higher than 100k. We can also remove the combinaisons with a risk coverage lower than the best coverage for every risk.
 
+### 2 - Try to be smart and present the bests first
+
 To optimized the number of calls, we can organized the measures from the "best" to the "worst" by sorting them by approximation of their value based on the coverage and the cost. So the best will increase quickly and there will be less calls.
+
+### 3 - Remenber the good ones even if they are not the best
+
+We can also remember the combinations that are not the best but beat other champions in at least on risk. Doing so it will be harder and harder to find a better combination.

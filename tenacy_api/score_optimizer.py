@@ -8,6 +8,7 @@ class ScoreOptimizer:
     def __init__(self, token):
         self.token = token
         self.best_measures = []
+        self.challenger_coverage_by_risk = []
         self.best_score = 0
         self.best_coverage = {}
         self.computation_metric = { "api_calls": 0 }
@@ -35,11 +36,16 @@ class ScoreOptimizer:
             if self.status["error"]:
                 break
 
-            if not self.__can_increase_coverage(measures_data):
+            coverage_by_risk = CoverageComputer(measures_data).call()
+            if not self.__can_increase_coverage(coverage_by_risk):
                 continue
 
             self.computation_metric["api_calls"] += 1
-            self.__try_measure(measures_data)
+
+            measures_data_identifiers = list(
+                map(lambda measures_data: measures_data["identifier"], measures_data)
+            )
+            self.__try_measure(measures_data_identifiers, coverage_by_risk)
     
     def __ordered_collection_of_measures_data(self):
         raw_collection = MeasuresData().all_combinations_of_3_measures()
@@ -70,30 +76,38 @@ class ScoreOptimizer:
         cost = sum(map(lambda measures_data: measures_data["cost"], measures_data))
         return cost <= self.BUDGET_LIMIT
     
-    def __can_increase_coverage(self, measures_data):
-        coverage_by_risk = CoverageComputer(measures_data).call()
+    def __can_increase_coverage(self, coverage_by_risk):
+        if len(self.challenger_coverage_by_risk) == 0:
+            return True
 
+        challenger_comparison = list(map(
+            lambda challenger_coverage_by_risk: self.__beat_at_least_one_risk_coverage(
+                challenger_coverage_by_risk,
+                coverage_by_risk
+            ),
+            self.challenger_coverage_by_risk
+        ))
+
+        return all(challenger_comparison)
+    
+    def __beat_at_least_one_risk_coverage(self, challenger_coverage_by_risk, coverage_by_risk):
         for risk in coverage_by_risk:
-            if risk not in self.best_coverage:
+            if risk not in challenger_coverage_by_risk:
+                return True
+            if coverage_by_risk[risk] > challenger_coverage_by_risk[risk]:
                 return True
 
-            if coverage_by_risk[risk] > self.best_coverage[risk]:
-                return True
+        return False
 
-    def __try_measure(self, measures_data):
-        measures_data_identifiers = list(
-            map(lambda measures_data: measures_data["identifier"], measures_data)
-        )
-
+    def __try_measure(self, measures_data_identifiers, coverage_by_risk):
         try:
             api_response = ApiPlayer(self.token, measures_data_identifiers).call()
             
             score = api_response["score"]
+            self.challenger_coverage_by_risk.append(coverage_by_risk)
 
             if score > self.best_score:
-                self.best_measures = list(
-                    map(lambda measures_data: measures_data["identifier"], measures_data)
-                )
+                self.best_measures = measures_data_identifiers
                 self.best_score = score
                 self.best_coverage = api_response["risks"]
         except Exception as e:

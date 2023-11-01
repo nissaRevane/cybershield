@@ -12,6 +12,7 @@ class ApiPlayer:
     
     def call(self):
         response = requests.post(self.URL, headers=self.__headers(), data=self.__data())
+
         if response.status_code == 200:
             return {
                 "score": response.json()["score"],
