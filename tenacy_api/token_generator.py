@@ -3,6 +3,7 @@ import json
 
 from tenacy_api.config import API_URL
 
+# Generate a token from a name and an email to access the API
 class TokenGenerator:
     URL = "{}/register".format(API_URL)
     HEADERS = {

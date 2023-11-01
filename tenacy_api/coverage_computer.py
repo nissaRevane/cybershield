@@ -1,3 +1,4 @@
+# From a list of measures, it returns an agregation of the coverage of each risk
 class CoverageComputer:
     def __init__(self, measures_data):
         self.measures_data = measures_data

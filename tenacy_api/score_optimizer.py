@@ -2,6 +2,7 @@ from tenacy_api.api_player import ApiPlayer
 from tenacy_api.measures_data import MeasuresData
 from tenacy_api.coverage_computer import CoverageComputer
 
+# Optimizes the score by calling the API with different combinations of measures
 class ScoreOptimizer:
     BUDGET_LIMIT = 100
 

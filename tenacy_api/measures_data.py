@@ -1,5 +1,6 @@
 import json
 
+# From a json file, it returns a collection of list of measures
 class MeasuresData:
     def __init__(self):
         with open("tenacy_api/measures_data.json", "r") as measures_file:

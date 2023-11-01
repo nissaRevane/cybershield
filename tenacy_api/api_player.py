@@ -3,6 +3,7 @@ import json
 
 from tenacy_api.config import API_URL
 
+# Calls the API to get the score and risks coverage from a list of measures
 class ApiPlayer:
     URL = "{}/play".format(API_URL)
 
@@ -34,4 +35,3 @@ class ApiPlayer:
     def __risks_coverage(self, risks):
         list_covergae_risk = list(map(lambda risk: (risk["identifier"], risk["coverage"]), risks))
         return dict(list_covergae_risk)
-        
