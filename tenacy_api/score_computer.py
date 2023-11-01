@@ -15,6 +15,7 @@ class ScoreComputer:
         if response.status_code == 200:
             return response.json()["score"]
         
+        # TODO: Handle error
         return 0
 
     def __headers(self):
