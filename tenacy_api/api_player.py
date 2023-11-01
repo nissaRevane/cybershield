@@ -3,7 +3,7 @@ import json
 
 from tenacy_api.config import API_URL
 
-class ScoreComputer:
+class ApiPlayer:
     URL = "{}/play".format(API_URL)
 
     def __init__(self, token, measures_data):
@@ -13,10 +13,11 @@ class ScoreComputer:
     def call(self):
         response = requests.post(self.URL, headers=self.__headers(), data=self.__data())
         if response.status_code == 200:
-            return response.json()["score"]
-        
-        # TODO: Handle error
-        return 0
+            return {
+                "score": response.json()["score"]
+            }
+
+        raise Exception("Error on API call: {}".format(response.json()["error"]))
 
     def __headers(self):
         return({
