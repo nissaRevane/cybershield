@@ -14,7 +14,8 @@ class ScoreOptimizer:
         self.status = { "error": False, "message": "ok" }
     
     def call(self):
-        self.__optimize(MeasuresData().all_combinations_of_3_measures())
+        measures_data_collection = self.__ordered_collection_of_measures_data()
+        self.__optimize(measures_data_collection)
 
         if self.status["error"]:
             return {
@@ -34,18 +35,40 @@ class ScoreOptimizer:
             if self.status["error"]:
                 break
 
-            if self.__is_over_budget(measures_data):
-                continue
-
             if not self.__can_increase_coverage(measures_data):
                 continue
 
             self.computation_metric["api_calls"] += 1
             self.__try_measure(measures_data)
     
-    def __is_over_budget(self, measures_data):
+    def __ordered_collection_of_measures_data(self):
+        raw_collection = MeasuresData().all_combinations_of_3_measures()
+        on_budget_collection = list(
+            filter(lambda measures_data: self.__on_budget(measures_data), raw_collection)
+        )
+
+        return sorted(
+            on_budget_collection,
+            key=lambda measures_data: self.__estimated_impact(measures_data),
+            reverse=True
+        )
+
+    def __estimated_impact(self, measures_data):
+        coverage_by_risk = CoverageComputer(measures_data).call()
+        risks_severity = dict(
+            map(
+                lambda risk: (risk["risk"], risk["severity"]),
+                measures_data[0]["riskCoverage"]
+            )
+        )
+
+        return sum(
+            map(lambda risk: coverage_by_risk[risk] * risks_severity[risk], coverage_by_risk)
+        )
+    
+    def __on_budget(self, measures_data):
         cost = sum(map(lambda measures_data: measures_data["cost"], measures_data))
-        return cost > self.BUDGET_LIMIT
+        return cost <= self.BUDGET_LIMIT
     
     def __can_increase_coverage(self, measures_data):
         coverage_by_risk = CoverageComputer(measures_data).call()
